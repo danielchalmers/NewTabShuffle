@@ -36,6 +36,17 @@ A Chrome/Edge browser extension that randomly displays URLs or local files every
    - Click "Load unpacked"
    - Select the `dist/` directory
 
+### Using Pre-built Package
+
+1. Build a package:
+   ```bash
+   npm run package
+   ```
+   
+2. This creates `newtab-shuffle.zip` which you can:
+   - Unzip and load as an unpacked extension
+   - Upload to Chrome Web Store (for distribution)
+
 ## Usage
 
 ### Adding URLs
@@ -55,7 +66,7 @@ A Chrome/Edge browser extension that randomly displays URLs or local files every
 - **Web URLs**: `https://example.com`, `http://localhost:3000`
 - **Local Files**: `file:///path/to/file.html`
 
-> **Note**: For `file://` URLs to work, you need to enable "Allow access to file URLs" in the extension settings.
+> **Note**: For `file://` URLs to work, you need to enable "Allow access to file URLs" in the extension settings (`chrome://extensions/` → Details → Allow access to file URLs).
 
 ## Development
 
@@ -107,7 +118,13 @@ NewTabShuffle/
 │   │   ├── storage.ts    # Chrome Storage API wrapper
 │   │   └── randomizer.ts # URL randomization logic
 │   ├── newtab/           # New tab page
+│   │   ├── index.html
+│   │   ├── newtab.ts
+│   │   └── newtab.css
 │   ├── options/          # Options page
+│   │   ├── index.html
+│   │   ├── options.ts
+│   │   └── options.css
 │   ├── icons/            # Extension icons
 │   └── manifest.json     # Extension manifest
 ├── tests/                # Vitest test files
@@ -122,9 +139,29 @@ NewTabShuffle/
 - **Testing**: Vitest - Fast unit test framework
 - **Extension API**: Chrome Extension Manifest V3
 
+## Scripts
+
+- `npm run dev` - Build in watch mode for development
+- `npm run build` - Production build
+- `npm run test` - Run tests
+- `npm run test:ui` - Run tests with UI
+- `npm run test:coverage` - Run tests with coverage report
+- `npm run package` - Build and create distributable ZIP file
+
 ## Contributing
 
 Contributions are welcome! Please feel free to submit a Pull Request.
+
+### Development Workflow
+
+1. Fork the repository
+2. Create a feature branch (`git checkout -b feature/amazing-feature`)
+3. Make your changes
+4. Run tests (`npm test`)
+5. Build the extension (`npm run build`)
+6. Commit your changes (`git commit -m 'Add amazing feature'`)
+7. Push to the branch (`git push origin feature/amazing-feature`)
+8. Open a Pull Request
 
 ## License
 
@@ -137,3 +174,12 @@ Created by [Daniel Chalmers](https://github.com/danielchalmers)
 ## Support
 
 If you encounter any issues or have questions, please [open an issue](https://github.com/danielchalmers/NewTabShuffle/issues) on GitHub.
+
+## Roadmap
+
+Potential future enhancements:
+- Import/export URL lists
+- URL categories/tags
+- Custom scheduling (time-based URL selection)
+- Preview URLs before display
+- Usage statistics
