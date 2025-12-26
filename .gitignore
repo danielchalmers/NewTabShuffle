@@ -5,6 +5,9 @@ node_modules/
 dist/
 build/
 
+# Package output
+*.zip
+
 # Environment files
 .env
 .env.local

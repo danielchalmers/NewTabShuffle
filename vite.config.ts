@@ -5,6 +5,7 @@ import fs from 'fs';
 import path from 'path';
 
 export default defineConfig({
+  base: './',
   build: {
     outDir: 'dist',
     emptyOutDir: true,
@@ -35,19 +36,6 @@ export default defineConfig({
     },
   },
   plugins: [
-    {
-      name: 'html-transform',
-      closeBundle() {
-        // After build, remove duplicate HTML files from src/ directory
-        const distDir = resolve(process.cwd(), 'dist');
-        const srcDir = path.join(distDir, 'src');
-        
-        // Remove the src directory if it exists
-        if (fs.existsSync(srcDir)) {
-          fs.rmSync(srcDir, { recursive: true, force: true });
-        }
-      },
-    },
     viteStaticCopy({
       targets: [
         {
@@ -58,15 +46,44 @@ export default defineConfig({
           src: 'src/icons/*.png',
           dest: 'icons',
         },
-        {
-          src: 'src/newtab/index.html',
-          dest: 'newtab',
-        },
-        {
-          src: 'src/options/index.html',
-          dest: 'options',
-        },
       ],
     }),
+    {
+      name: 'move-html-files',
+      closeBundle() {
+        const distDir = resolve(process.cwd(), 'dist');
+        const srcDir = path.join(distDir, 'src');
+        
+        // Move HTML files from dist/src/ to dist/ and remove src dir
+        if (fs.existsSync(srcDir)) {
+          // Move newtab HTML
+          const newtabSrc = path.join(srcDir, 'newtab', 'index.html');
+          const newtabDest = path.join(distDir, 'newtab', 'index.html');
+          if (fs.existsSync(newtabSrc)) {
+            let html = fs.readFileSync(newtabSrc, 'utf-8');
+            // Fix paths: replace ../../newtab/ with ./
+            html = html.replace(/\.\.\/\.\.\/newtab\//g, './');
+            // Fix paths: replace ../../chunks/ with ../chunks/
+            html = html.replace(/\.\.\/\.\.\/chunks\//g, '../chunks/');
+            fs.writeFileSync(newtabDest, html);
+          }
+          
+          // Move options HTML
+          const optionsSrc = path.join(srcDir, 'options', 'index.html');
+          const optionsDest = path.join(distDir, 'options', 'index.html');
+          if (fs.existsSync(optionsSrc)) {
+            let html = fs.readFileSync(optionsSrc, 'utf-8');
+            // Fix paths: replace ../../options/ with ./
+            html = html.replace(/\.\.\/\.\.\/options\//g, './');
+            // Fix paths: replace ../../chunks/ with ../chunks/
+            html = html.replace(/\.\.\/\.\.\/chunks\//g, '../chunks/');
+            fs.writeFileSync(optionsDest, html);
+          }
+          
+          // Remove the src directory
+          fs.rmSync(srcDir, { recursive: true, force: true });
+        }
+      },
+    },
   ],
 });
