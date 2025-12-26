@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>NewTab Shuffle Options</title>
+  <link rel="stylesheet" href="./options.css">
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>NewTab Shuffle Options</h1>
+      <p class="subtitle">Manage URLs to display on new tabs</p>
+    </header>
+    
+    <main>
+      <section class="add-url-section">
+        <h2>Add New URL</h2>
+        <div class="add-url-form">
+          <input 
+            type="text" 
+            id="url-input" 
+            placeholder="https://example.com or file:///path/to/file.html"
+          />
+          <button id="add-button">Add URL</button>
+        </div>
+        <p class="hint">Supports http://, https://, and file:// URLs</p>
+      </section>
+      
+      <section class="url-list-section">
+        <h2>Your URLs</h2>
+        <div id="url-list" class="url-list"></div>
+        <p id="empty-message" class="empty-message hidden">
+          No URLs added yet. Add your first URL above to get started!
+        </p>
+      </section>
+    </main>
+  </div>
+  
+  <script type="module" src="./options.ts"></script>
+</body>
+</html>
