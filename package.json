@@ -1,0 +1,33 @@
+{
+  "name": "newtab-shuffle",
+  "version": "1.0.0",
+  "description": "A Chrome/Edge extension that randomly displays URLs or local files when opening a new tab",
+  "type": "module",
+  "scripts": {
+    "dev": "vite build --watch --mode development",
+    "build": "tsc && vite build",
+    "test": "vitest",
+    "test:ui": "vitest --ui",
+    "test:coverage": "vitest --coverage",
+    "preview": "vite preview",
+    "package": "npm run build && cd dist && zip -r ../newtab-shuffle.zip ."
+  },
+  "keywords": [
+    "chrome-extension",
+    "edge-extension",
+    "new-tab",
+    "random"
+  ],
+  "author": "Daniel Chalmers",
+  "license": "MIT",
+  "devDependencies": {
+    "@types/chrome": "^0.0.268",
+    "@types/node": "^20.12.7",
+    "@vitest/ui": "^1.5.0",
+    "jsdom": "^24.0.0",
+    "typescript": "^5.4.5",
+    "vite": "^5.2.10",
+    "vite-plugin-static-copy": "^1.0.4",
+    "vitest": "^1.5.0"
+  }
+}
