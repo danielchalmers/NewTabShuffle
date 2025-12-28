@@ -6,13 +6,14 @@
   },
   "typescript.tsdk": "node_modules/typescript/lib",
   "typescript.enablePromptUseWorkspaceTsdk": true,
+  "files.exclude": {
+    "node_modules": true,
+    "dist": true
+  },
+  "files.associations": {
+    "*.json": "jsonc"
+  },
   "[typescript]": {
-    "editor.defaultFormatter": "esbenp.prettier-vscode"
-  },
-  "[javascript]": {
-    "editor.defaultFormatter": "esbenp.prettier-vscode"
-  },
-  "[json]": {
     "editor.defaultFormatter": "esbenp.prettier-vscode"
   }
 }
