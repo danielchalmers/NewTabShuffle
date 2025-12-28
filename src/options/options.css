@@ -21,6 +21,12 @@ header {
   margin-bottom: 24px;
 }
 
+main {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
 h1 {
   font-size: 32px;
   font-weight: 600;
@@ -60,7 +66,8 @@ h1 {
   margin-bottom: 8px;
 }
 
-#urls-textarea {
+#urls-textarea,
+#queue-textarea {
   width: 100%;
   min-height: 280px;
   padding: 12px 14px;
@@ -71,10 +78,48 @@ h1 {
   resize: vertical;
 }
 
-#urls-textarea:focus {
+#urls-textarea:focus,
+#queue-textarea:focus {
   outline: none;
   border-color: #4285f4;
   box-shadow: 0 0 0 3px rgba(66, 133, 244, 0.1);
+}
+
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 16px;
+  margin-bottom: 12px;
+  flex-wrap: wrap;
+}
+
+.section-title {
+  font-size: 18px;
+  font-weight: 600;
+  color: #1a1a1a;
+  margin-bottom: 4px;
+}
+
+.section-note {
+  font-size: 14px;
+  color: #666;
+  max-width: 520px;
+}
+
+.secondary-button {
+  border: 1px solid #cbd5e1;
+  background: #f8fafc;
+  color: #1f2937;
+  font-size: 12px;
+  padding: 8px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  height: fit-content;
+}
+
+.secondary-button:hover {
+  background: #eef2f7;
 }
 
 .status-row {
@@ -124,7 +169,8 @@ h1 {
     font-size: 28px;
   }
 
-  #urls-textarea {
+  #urls-textarea,
+  #queue-textarea {
     min-height: 240px;
   }
 }

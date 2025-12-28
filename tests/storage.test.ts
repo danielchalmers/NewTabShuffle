@@ -1,5 +1,15 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
-import { getUrls, saveUrls, addUrl, removeUrl, updateUrl, toggleUrl } from '../src/lib/storage';
+import {
+  getUrls,
+  saveUrls,
+  addUrl,
+  removeUrl,
+  updateUrl,
+  toggleUrl,
+  getQueue,
+  saveQueue,
+  clearQueue,
+} from '../src/lib/storage';
 import type { UrlEntry } from '../src/lib/storage';
 
 // Mock chrome.storage API
@@ -53,6 +63,43 @@ describe('storage', () => {
       
       expect(mockStorage.urls).toEqual(testUrls);
       expect(chrome.storage.sync.set).toHaveBeenCalledWith({ urls: testUrls });
+    });
+  });
+
+  describe('getQueue', () => {
+    it('should return empty array when no queue is stored', async () => {
+      const queue = await getQueue();
+      expect(queue).toEqual([]);
+    });
+
+    it('should return stored queue entries', async () => {
+      const testQueue = ['https://example.com', 'https://second.com'];
+      mockStorage.queue = testQueue;
+
+      const queue = await getQueue();
+      expect(queue).toEqual(testQueue);
+    });
+  });
+
+  describe('saveQueue', () => {
+    it('should save queue to storage', async () => {
+      const testQueue = ['https://example.com'];
+
+      await saveQueue(testQueue);
+
+      expect(mockStorage.queue).toEqual(testQueue);
+      expect(chrome.storage.sync.set).toHaveBeenCalledWith({ queue: testQueue });
+    });
+  });
+
+  describe('clearQueue', () => {
+    it('should clear stored queue entries', async () => {
+      mockStorage.queue = ['https://example.com'];
+
+      await clearQueue();
+
+      const queue = await getQueue();
+      expect(queue).toEqual([]);
     });
   });
 

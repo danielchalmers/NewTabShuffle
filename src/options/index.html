@@ -11,6 +11,7 @@
     <header>
       <h1>New Tab Shuffle Options</h1>
       <p class="subtitle">Paste URLs below, one per line. Changes save automatically.</p>
+      <p class="subtitle">New tabs use a shuffled queue, showing each enabled URL once before reshuffling.</p>
       <ul class="guide">
         <li>Delete a line to remove it.</li>
         <li>Start a line with # to disable it.</li>
@@ -31,6 +32,30 @@
           <span id="count-status" class="counts">No URLs yet</span>
         </div>
         <p id="error-message" class="error hidden"></p>
+      </section>
+
+      <section class="editor-section">
+        <div class="section-header">
+          <div>
+            <h2 class="section-title">Queue</h2>
+            <p class="section-note">
+              The first line is next. You can add temporary entries here even if they are not in your main list.
+              Reset clears the queue so it reshuffles.
+            </p>
+          </div>
+          <button id="queue-reset" class="secondary-button" type="button">Clear queue</button>
+        </div>
+        <label class="editor-label" for="queue-textarea">Current queue</label>
+        <textarea
+          id="queue-textarea"
+          spellcheck="false"
+          placeholder="https://example.com&#10;https://another.example.com"
+        ></textarea>
+        <div class="status-row">
+          <span id="queue-save-status" class="status" data-state="saved">Saved</span>
+          <span id="queue-count-status" class="counts">Queue empty</span>
+        </div>
+        <p id="queue-error-message" class="error hidden"></p>
       </section>
     </main>
   </div>

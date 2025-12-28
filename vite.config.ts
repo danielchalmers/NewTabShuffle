@@ -13,6 +13,7 @@ export default defineConfig({
       input: {
         newtab: resolve(__dirname, 'src/newtab/index.html'),
         options: resolve(__dirname, 'src/options/index.html'),
+        popup: resolve(__dirname, 'src/popup/index.html'),
       },
       output: {
         entryFileNames: (chunkInfo) => {
@@ -28,6 +29,8 @@ export default defineConfig({
               return 'newtab/newtab.css';
             } else if (name.includes('options')) {
               return 'options/options.css';
+            } else if (name.includes('popup')) {
+              return 'popup/popup.css';
             }
           }
           return 'assets/[name][extname]';
@@ -78,6 +81,18 @@ export default defineConfig({
             // Fix paths: replace ../../chunks/ with ../chunks/
             html = html.replace(/\.\.\/\.\.\/chunks\//g, '../chunks/');
             fs.writeFileSync(optionsDest, html);
+          }
+
+          // Move popup HTML
+          const popupSrc = path.join(srcDir, 'popup', 'index.html');
+          const popupDest = path.join(distDir, 'popup', 'index.html');
+          if (fs.existsSync(popupSrc)) {
+            let html = fs.readFileSync(popupSrc, 'utf-8');
+            // Fix paths: replace ../../popup/ with ./
+            html = html.replace(/\.\.\/\.\.\/popup\//g, './');
+            // Fix paths: replace ../../chunks/ with ../chunks/
+            html = html.replace(/\.\.\/\.\.\/chunks\//g, '../chunks/');
+            fs.writeFileSync(popupDest, html);
           }
           
           // Remove the src directory

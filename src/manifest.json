@@ -19,6 +19,7 @@
     "file:///*"
   ],
   "action": {
-    "default_title": "New Tab Shuffle Options"
+    "default_title": "New Tab Shuffle Options",
+    "default_popup": "popup/index.html"
   }
 }

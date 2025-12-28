@@ -8,14 +8,28 @@ export interface UrlEntry {
 }
 
 const STORAGE_KEY = 'urls';
+const QUEUE_KEY = 'queue';
 
 export async function getUrls(): Promise<UrlEntry[]> {
   const result = await chrome.storage.sync.get(STORAGE_KEY);
   return result[STORAGE_KEY] || [];
 }
 
+export async function getQueue(): Promise<string[]> {
+  const result = await chrome.storage.sync.get(QUEUE_KEY);
+  return result[QUEUE_KEY] || [];
+}
+
 export async function saveUrls(urls: UrlEntry[]): Promise<void> {
   await chrome.storage.sync.set({ [STORAGE_KEY]: urls });
+}
+
+export async function saveQueue(queue: string[]): Promise<void> {
+  await chrome.storage.sync.set({ [QUEUE_KEY]: queue });
+}
+
+export async function clearQueue(): Promise<void> {
+  await saveQueue([]);
 }
 
 export async function addUrl(url: string): Promise<void> {

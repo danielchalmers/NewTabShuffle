@@ -15,6 +15,21 @@ export function getRandomUrl(urls: UrlEntry[]): string | null {
   return enabledUrls[randomIndex].url;
 }
 
+export function getShuffledUrls(urls: UrlEntry[]): string[] {
+  const enabledUrls = urls.filter((entry) => entry.enabled).map((entry) => entry.url);
+  if (enabledUrls.length <= 1) {
+    return [...enabledUrls];
+  }
+
+  const shuffled = [...enabledUrls];
+  for (let i = shuffled.length - 1; i > 0; i -= 1) {
+    const swapIndex = getRandomIndex(i + 1);
+    [shuffled[i], shuffled[swapIndex]] = [shuffled[swapIndex], shuffled[i]];
+  }
+
+  return shuffled;
+}
+
 function getRandomIndex(max: number): number {
   const cryptoApi = globalThis.crypto;
   if (cryptoApi && typeof cryptoApi.getRandomValues === 'function') {

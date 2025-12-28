@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { getRandomUrl, validateUrl } from '../src/lib/randomizer';
+import { getRandomUrl, getShuffledUrls, validateUrl } from '../src/lib/randomizer';
 import type { UrlEntry } from '../src/lib/storage';
 
 describe('randomizer', () => {
@@ -54,6 +54,29 @@ describe('randomizer', () => {
       
       // With 5 URLs and 20 trials, we should get at least 2 different URLs
       expect(results.size).toBeGreaterThan(1);
+    });
+  });
+
+  describe('getShuffledUrls', () => {
+    it('should return empty array when no URLs are enabled', () => {
+      const urls: UrlEntry[] = [
+        { url: 'https://example.com', enabled: false },
+      ];
+
+      const result = getShuffledUrls(urls);
+      expect(result).toEqual([]);
+    });
+
+    it('should return only enabled URLs', () => {
+      const urls: UrlEntry[] = [
+        { url: 'https://enabled1.com', enabled: true },
+        { url: 'https://enabled2.com', enabled: true },
+        { url: 'https://disabled.com', enabled: false },
+      ];
+
+      const result = getShuffledUrls(urls);
+      expect(result).toHaveLength(2);
+      expect(new Set(result)).toEqual(new Set(['https://enabled1.com', 'https://enabled2.com']));
     });
   });
 

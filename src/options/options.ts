@@ -1,4 +1,4 @@
-import { getUrls, saveUrls } from '../lib/storage';
+import { clearQueue, getQueue, getUrls, saveQueue, saveUrls } from '../lib/storage';
 import { validateUrl } from '../lib/randomizer';
 import type { UrlEntry } from '../lib/storage';
 
@@ -7,8 +7,16 @@ const saveStatus = document.getElementById('save-status') as HTMLSpanElement;
 const countStatus = document.getElementById('count-status') as HTMLSpanElement;
 const errorMessage = document.getElementById('error-message') as HTMLParagraphElement;
 
+const queueTextarea = document.getElementById('queue-textarea') as HTMLTextAreaElement;
+const queueSaveStatus = document.getElementById('queue-save-status') as HTMLSpanElement;
+const queueCountStatus = document.getElementById('queue-count-status') as HTMLSpanElement;
+const queueErrorMessage = document.getElementById('queue-error-message') as HTMLParagraphElement;
+const queueResetButton = document.getElementById('queue-reset') as HTMLButtonElement;
+
 const SAVE_DELAY_MS = 500;
 let saveTimer: number | undefined;
+let queueSaveTimer: number | undefined;
+let isQueueDirty = false;
 
 function formatUrls(urls: UrlEntry[]): string {
   return urls
@@ -78,6 +86,39 @@ function parseUrlText(text: string): {
   };
 }
 
+function formatQueue(queue: string[]): string {
+  return queue.join('\n');
+}
+
+function parseQueueText(text: string): {
+  entries: string[];
+  invalidLines: number[];
+} {
+  const entries: string[] = [];
+  const invalidLines: number[] = [];
+  const lines = text.split(/\r?\n/);
+
+  lines.forEach((rawLine, index) => {
+    const trimmed = rawLine.trim();
+    if (!trimmed) {
+      return;
+    }
+
+    if (trimmed.startsWith('#')) {
+      return;
+    }
+
+    if (!validateUrl(trimmed)) {
+      invalidLines.push(index + 1);
+      return;
+    }
+
+    entries.push(trimmed);
+  });
+
+  return { entries, invalidLines };
+}
+
 function setSaveState(state: 'saved' | 'saving' | 'error') {
   saveStatus.dataset.state = state;
 
@@ -94,6 +135,22 @@ function setSaveState(state: 'saved' | 'saving' | 'error') {
   saveStatus.textContent = 'Saved';
 }
 
+function setQueueSaveState(state: 'saved' | 'saving' | 'error') {
+  queueSaveStatus.dataset.state = state;
+
+  if (state === 'saving') {
+    queueSaveStatus.textContent = 'Saving...';
+    return;
+  }
+
+  if (state === 'error') {
+    queueSaveStatus.textContent = 'Not saved';
+    return;
+  }
+
+  queueSaveStatus.textContent = 'Saved';
+}
+
 function updateCounts(enabled: number, disabled: number, invalid: number) {
   if (enabled === 0 && disabled === 0 && invalid === 0) {
     countStatus.textContent = 'No URLs yet';
@@ -107,6 +164,19 @@ function updateCounts(enabled: number, disabled: number, invalid: number) {
   countStatus.textContent = parts.join(' | ');
 }
 
+function updateQueueCounts(count: number, invalid: number) {
+  if (count === 0 && invalid === 0) {
+    queueCountStatus.textContent = 'Queue empty';
+    return;
+  }
+
+  const parts = [`${count} in queue`];
+  if (invalid > 0) {
+    parts.push(`${invalid} invalid`);
+  }
+  queueCountStatus.textContent = parts.join(' | ');
+}
+
 function showError(invalidLines: number[]) {
   if (invalidLines.length === 0) {
     errorMessage.classList.add('hidden');
@@ -117,6 +187,18 @@ function showError(invalidLines: number[]) {
   const lineLabel = invalidLines.length === 1 ? 'line' : 'lines';
   errorMessage.textContent = `Invalid URL on ${lineLabel}: ${invalidLines.join(', ')}. Fix to save.`;
   errorMessage.classList.remove('hidden');
+}
+
+function showQueueError(invalidLines: number[]) {
+  if (invalidLines.length === 0) {
+    queueErrorMessage.classList.add('hidden');
+    queueErrorMessage.textContent = '';
+    return;
+  }
+
+  const lineLabel = invalidLines.length === 1 ? 'line' : 'lines';
+  queueErrorMessage.textContent = `Invalid URL on ${lineLabel}: ${invalidLines.join(', ')}. Fix to save.`;
+  queueErrorMessage.classList.remove('hidden');
 }
 
 async function saveFromTextarea() {
@@ -135,6 +217,23 @@ async function saveFromTextarea() {
   setSaveState('saved');
 }
 
+async function saveQueueFromTextarea() {
+  const { entries, invalidLines } = parseQueueText(queueTextarea.value);
+
+  updateQueueCounts(entries.length, invalidLines.length);
+
+  if (invalidLines.length > 0) {
+    setQueueSaveState('error');
+    showQueueError(invalidLines);
+    return;
+  }
+
+  showQueueError([]);
+  await saveQueue(entries);
+  setQueueSaveState('saved');
+  isQueueDirty = false;
+}
+
 function scheduleSave() {
   if (saveTimer) {
     window.clearTimeout(saveTimer);
@@ -147,13 +246,66 @@ function scheduleSave() {
   }, SAVE_DELAY_MS);
 }
 
+function scheduleQueueSave() {
+  if (queueSaveTimer) {
+    window.clearTimeout(queueSaveTimer);
+  }
+
+  setQueueSaveState('saving');
+  queueErrorMessage.classList.add('hidden');
+  isQueueDirty = true;
+  queueSaveTimer = window.setTimeout(() => {
+    void saveQueueFromTextarea();
+  }, SAVE_DELAY_MS);
+}
+
+async function resetQueue() {
+  if (queueSaveTimer) {
+    window.clearTimeout(queueSaveTimer);
+  }
+
+  queueTextarea.value = '';
+  showQueueError([]);
+  updateQueueCounts(0, 0);
+  setQueueSaveState('saving');
+  await clearQueue();
+  setQueueSaveState('saved');
+}
+
+function applyQueueUpdate(queue: string[]) {
+  if (queueSaveTimer) {
+    window.clearTimeout(queueSaveTimer);
+  }
+
+  queueTextarea.value = formatQueue(queue);
+  updateQueueCounts(queue.length, 0);
+  showQueueError([]);
+  setQueueSaveState('saved');
+  isQueueDirty = false;
+}
+
 async function init() {
-  const urls = await getUrls();
+  const [urls, queue] = await Promise.all([getUrls(), getQueue()]);
   textarea.value = formatUrls(urls);
 
   const counts = countUrls(urls);
   updateCounts(counts.enabled, counts.disabled, 0);
   setSaveState('saved');
+
+  applyQueueUpdate(queue);
+
+  chrome.storage.onChanged.addListener((changes, areaName) => {
+    if (areaName !== 'sync' || !changes.queue) {
+      return;
+    }
+
+    if (document.activeElement === queueTextarea || isQueueDirty) {
+      return;
+    }
+
+    const nextQueue = changes.queue.newValue as string[] | undefined;
+    applyQueueUpdate(nextQueue ?? []);
+  });
 }
 
 textarea.addEventListener('input', scheduleSave);
@@ -162,6 +314,19 @@ textarea.addEventListener('blur', () => {
     window.clearTimeout(saveTimer);
   }
   void saveFromTextarea();
+});
+
+queueTextarea.addEventListener('input', scheduleQueueSave);
+queueTextarea.addEventListener('blur', () => {
+  if (queueSaveTimer) {
+    window.clearTimeout(queueSaveTimer);
+  }
+  void saveQueueFromTextarea();
+  isQueueDirty = false;
+});
+
+queueResetButton.addEventListener('click', () => {
+  void resetQueue();
 });
 
 void init();
