@@ -4,7 +4,7 @@ This file provides guidance for AI coding agents working on this project.
 
 ## Project Overview
 
-New Tab Shuffle is a Chrome/Edge browser extension that randomly displays URLs or local files when opening a new tab. Users can manage a list of URLs through the options page, and each new tab will randomly select and display one of the enabled URLs.
+New Tab Shuffle is a Chrome/Edge browser extension that randomly displays URLs or local files when opening a new tab. Users manage a list of URLs through the options page; each new tab selects one of the enabled URLs.
 
 ## Architecture
 
@@ -13,26 +13,6 @@ New Tab Shuffle is a Chrome/Edge browser extension that randomly displays URLs o
 - **Language**: TypeScript for type safety
 - **Testing**: Vitest for unit testing
 - **Browser APIs**: Chrome Extension Manifest V3
-
-### Project Structure
-```
-src/
-├── lib/              # Core library modules
-│   ├── storage.ts    # Chrome Storage API wrapper
-│   └── randomizer.ts # URL randomization logic
-├── newtab/           # New tab page
-│   ├── index.html
-│   ├── newtab.ts
-│   └── newtab.css
-├── options/          # Options/settings page
-│   ├── index.html
-│   ├── options.ts
-│   └── options.css
-├── icons/            # Extension icons
-└── manifest.json     # Extension manifest
-
-tests/                # Vitest test files
-```
 
 ### Key Design Principles
 1. **Separation of Concerns**: Core logic in `lib/`, UI in separate directories
@@ -103,12 +83,3 @@ After building:
 - file:// URLs require special permissions in Chrome
 - Extension cannot access chrome:// pages
 - Storage sync has size limits (Chrome imposes quotas)
-
-## Future Enhancements
-
-Potential areas for expansion:
-- Import/export URL lists
-- URL categories/tags
-- Custom scheduling (time-based URL selection)
-- Preview before display
-- Analytics/usage tracking
