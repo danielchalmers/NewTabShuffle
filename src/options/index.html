@@ -10,33 +10,31 @@
   <div class="container">
     <header>
       <h1>New Tab Shuffle Options</h1>
-      <p class="subtitle">Manage URLs to display on new tabs</p>
+      <p class="subtitle">Paste URLs below, one per line. Changes save automatically.</p>
+      <ul class="guide">
+        <li>Delete a line to remove it.</li>
+        <li>Start a line with # to disable it.</li>
+        <li>Supports http://, https://, and file://.</li>
+      </ul>
     </header>
-    
+
     <main>
-      <section class="add-url-section">
-        <h2>Add New URL</h2>
-        <div class="add-url-form">
-          <input 
-            type="text" 
-            id="url-input" 
-            placeholder="https://example.com or file:///path/to/file.html"
-          />
-          <button id="add-button">Add URL</button>
+      <section class="editor-section">
+        <label class="editor-label" for="urls-textarea">Your URLs</label>
+        <textarea
+          id="urls-textarea"
+          spellcheck="false"
+          placeholder="https://example.com&#10;# https://paused.example.com&#10;file:///C:/path/to/file.html"
+        ></textarea>
+        <div class="status-row">
+          <span id="save-status" class="status" data-state="saved">Saved</span>
+          <span id="count-status" class="counts">No URLs yet</span>
         </div>
-        <p class="hint">Supports http://, https://, and file:// URLs</p>
-      </section>
-      
-      <section class="url-list-section">
-        <h2>Your URLs</h2>
-        <div id="url-list" class="url-list"></div>
-        <p id="empty-message" class="empty-message hidden">
-          No URLs added yet. Add your first URL above to get started!
-        </p>
+        <p id="error-message" class="error hidden"></p>
       </section>
     </main>
   </div>
-  
+
   <script type="module" src="options.ts"></script>
 </body>
 </html>

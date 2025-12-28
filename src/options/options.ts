@@ -1,130 +1,167 @@
-import { getUrls, addUrl, removeUrl, toggleUrl, updateUrl } from '../lib/storage';
+import { getUrls, saveUrls } from '../lib/storage';
 import { validateUrl } from '../lib/randomizer';
+import type { UrlEntry } from '../lib/storage';
 
-const urlInput = document.getElementById('url-input') as HTMLInputElement;
-const addButton = document.getElementById('add-button') as HTMLButtonElement;
-const urlList = document.getElementById('url-list') as HTMLDivElement;
-const emptyMessage = document.getElementById('empty-message') as HTMLParagraphElement;
+const textarea = document.getElementById('urls-textarea') as HTMLTextAreaElement;
+const saveStatus = document.getElementById('save-status') as HTMLSpanElement;
+const countStatus = document.getElementById('count-status') as HTMLSpanElement;
+const errorMessage = document.getElementById('error-message') as HTMLParagraphElement;
 
-async function renderUrls() {
+const SAVE_DELAY_MS = 500;
+let saveTimer: number | undefined;
+
+function formatUrls(urls: UrlEntry[]): string {
+  return urls
+    .map((entry) => (entry.enabled ? entry.url : `# ${entry.url}`))
+    .join('\n');
+}
+
+function countUrls(urls: UrlEntry[]): { enabled: number; disabled: number } {
+  return urls.reduce(
+    (counts, entry) => {
+      if (entry.enabled) {
+        counts.enabled += 1;
+      } else {
+        counts.disabled += 1;
+      }
+      return counts;
+    },
+    { enabled: 0, disabled: 0 }
+  );
+}
+
+function parseUrlText(text: string): {
+  entries: UrlEntry[];
+  invalidLines: number[];
+  enabledCount: number;
+  disabledCount: number;
+} {
+  const entries: UrlEntry[] = [];
+  const invalidLines: number[] = [];
+  let enabledCount = 0;
+  let disabledCount = 0;
+
+  const lines = text.split(/\r?\n/);
+
+  lines.forEach((rawLine, index) => {
+    const trimmed = rawLine.trim();
+    if (!trimmed) {
+      return;
+    }
+
+    const isDisabled = trimmed.startsWith('#');
+    const candidate = isDisabled ? trimmed.slice(1).trim() : trimmed;
+
+    if (!candidate) {
+      return;
+    }
+
+    if (!validateUrl(candidate)) {
+      invalidLines.push(index + 1);
+      return;
+    }
+
+    entries.push({ url: candidate, enabled: !isDisabled });
+
+    if (isDisabled) {
+      disabledCount += 1;
+    } else {
+      enabledCount += 1;
+    }
+  });
+
+  return {
+    entries,
+    invalidLines,
+    enabledCount,
+    disabledCount,
+  };
+}
+
+function setSaveState(state: 'saved' | 'saving' | 'error') {
+  saveStatus.dataset.state = state;
+
+  if (state === 'saving') {
+    saveStatus.textContent = 'Saving...';
+    return;
+  }
+
+  if (state === 'error') {
+    saveStatus.textContent = 'Not saved';
+    return;
+  }
+
+  saveStatus.textContent = 'Saved';
+}
+
+function updateCounts(enabled: number, disabled: number, invalid: number) {
+  if (enabled === 0 && disabled === 0 && invalid === 0) {
+    countStatus.textContent = 'No URLs yet';
+    return;
+  }
+
+  const parts = [`${enabled} enabled`, `${disabled} disabled`];
+  if (invalid > 0) {
+    parts.push(`${invalid} invalid`);
+  }
+  countStatus.textContent = parts.join(' | ');
+}
+
+function showError(invalidLines: number[]) {
+  if (invalidLines.length === 0) {
+    errorMessage.classList.add('hidden');
+    errorMessage.textContent = '';
+    return;
+  }
+
+  const lineLabel = invalidLines.length === 1 ? 'line' : 'lines';
+  errorMessage.textContent = `Invalid URL on ${lineLabel}: ${invalidLines.join(', ')}. Fix to save.`;
+  errorMessage.classList.remove('hidden');
+}
+
+async function saveFromTextarea() {
+  const { entries, invalidLines, enabledCount, disabledCount } = parseUrlText(textarea.value);
+
+  updateCounts(enabledCount, disabledCount, invalidLines.length);
+
+  if (invalidLines.length > 0) {
+    setSaveState('error');
+    showError(invalidLines);
+    return;
+  }
+
+  showError([]);
+  await saveUrls(entries);
+  setSaveState('saved');
+}
+
+function scheduleSave() {
+  if (saveTimer) {
+    window.clearTimeout(saveTimer);
+  }
+
+  setSaveState('saving');
+  errorMessage.classList.add('hidden');
+  saveTimer = window.setTimeout(() => {
+    void saveFromTextarea();
+  }, SAVE_DELAY_MS);
+}
+
+async function init() {
   const urls = await getUrls();
-  
-  if (urls.length === 0) {
-    urlList.innerHTML = '';
-    emptyMessage.classList.remove('hidden');
-    return;
-  }
-  
-  emptyMessage.classList.add('hidden');
-  
-  urlList.innerHTML = urls.map((entry, index) => `
-    <div class="url-item ${entry.enabled ? '' : 'disabled'}">
-      <div class="url-checkbox">
-        <input 
-          type="checkbox" 
-          ${entry.enabled ? 'checked' : ''} 
-          data-index="${index}"
-          class="toggle-checkbox"
-        />
-      </div>
-      <div class="url-content">
-        <input 
-          type="text" 
-          value="${escapeHtml(entry.url)}" 
-          data-index="${index}"
-          class="url-edit-input"
-        />
-      </div>
-      <div class="url-actions">
-        <button class="delete-button" data-index="${index}">Delete</button>
-      </div>
-    </div>
-  `).join('');
-  
-  // Add event listeners
-  document.querySelectorAll('.toggle-checkbox').forEach((checkbox) => {
-    checkbox.addEventListener('change', handleToggle);
-  });
-  
-  document.querySelectorAll('.delete-button').forEach((button) => {
-    button.addEventListener('click', handleDelete);
-  });
-  
-  document.querySelectorAll('.url-edit-input').forEach((input) => {
-    input.addEventListener('blur', handleEdit);
-  });
+  textarea.value = formatUrls(urls);
+
+  const counts = countUrls(urls);
+  updateCounts(counts.enabled, counts.disabled, 0);
+  setSaveState('saved');
 }
 
-async function handleAdd() {
-  const url = urlInput.value.trim();
-  
-  if (!url) {
-    alert('Please enter a URL');
-    return;
+textarea.addEventListener('input', scheduleSave);
+textarea.addEventListener('blur', () => {
+  if (saveTimer) {
+    window.clearTimeout(saveTimer);
   }
-  
-  if (!validateUrl(url)) {
-    alert('Please enter a valid URL (must start with http://, https://, or file://)');
-    return;
-  }
-  
-  await addUrl(url);
-  urlInput.value = '';
-  await renderUrls();
-}
-
-async function handleToggle(event: Event) {
-  const checkbox = event.target as HTMLInputElement;
-  const index = parseInt(checkbox.dataset.index || '0', 10);
-  await toggleUrl(index);
-  await renderUrls();
-}
-
-async function handleDelete(event: Event) {
-  const button = event.target as HTMLButtonElement;
-  const index = parseInt(button.dataset.index || '0', 10);
-  
-  if (confirm('Are you sure you want to delete this URL?')) {
-    await removeUrl(index);
-    await renderUrls();
-  }
-}
-
-async function handleEdit(event: Event) {
-  const input = event.target as HTMLInputElement;
-  const index = parseInt(input.dataset.index || '0', 10);
-  const newUrl = input.value.trim();
-  
-  if (!newUrl) {
-    alert('URL cannot be empty');
-    await renderUrls();
-    return;
-  }
-  
-  if (!validateUrl(newUrl)) {
-    alert('Please enter a valid URL (must start with http://, https://, or file://)');
-    await renderUrls();
-    return;
-  }
-  
-  const urls = await getUrls();
-  await updateUrl(index, { ...urls[index], url: newUrl });
-  await renderUrls();
-}
-
-function escapeHtml(text: string): string {
-  const div = document.createElement('div');
-  div.textContent = text;
-  return div.innerHTML;
-}
-
-// Event listeners
-addButton.addEventListener('click', handleAdd);
-urlInput.addEventListener('keypress', (event) => {
-  if (event.key === 'Enter') {
-    handleAdd();
-  }
+  void saveFromTextarea();
 });
 
-// Initial render
-renderUrls();
+void init();

@@ -11,8 +11,18 @@ export function getRandomUrl(urls: UrlEntry[]): string | null {
     return null;
   }
   
-  const randomIndex = Math.floor(Math.random() * enabledUrls.length);
+  const randomIndex = getRandomIndex(enabledUrls.length);
   return enabledUrls[randomIndex].url;
+}
+
+function getRandomIndex(max: number): number {
+  const cryptoApi = globalThis.crypto;
+  if (cryptoApi && typeof cryptoApi.getRandomValues === 'function') {
+    const buffer = new Uint32Array(1);
+    cryptoApi.getRandomValues(buffer);
+    return buffer[0] % max;
+  }
+  return Math.floor(Math.random() * max);
 }
 
 export function validateUrl(url: string): boolean {
