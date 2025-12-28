@@ -39,13 +39,13 @@ jobs:
         run: bash verify.sh
 
       - name: Create extension zip
-        run: cd dist && zip -r ../newtab-shuffle-${{ steps.get_version.outputs.VERSION }}.zip .
+        run: cd dist && zip -r ../newtabshuffle-${{ steps.get_version.outputs.VERSION }}.zip .
 
       - name: Create GitHub release
         uses: ncipollo/release-action@v1
         with:
           tag: v${{ steps.get_version.outputs.VERSION }}
-          artifacts: newtab-shuffle-${{ steps.get_version.outputs.VERSION }}.zip
+          artifacts: newtabshuffle-${{ steps.get_version.outputs.VERSION }}.zip
           allowUpdates: false
           removeArtifacts: true
           omitBodyDuringUpdate: true

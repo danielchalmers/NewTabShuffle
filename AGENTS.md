@@ -4,7 +4,7 @@ This file provides guidance for AI coding agents working on this project.
 
 ## Project Overview
 
-NewTab Shuffle is a Chrome/Edge browser extension that randomly displays URLs or local files when opening a new tab. Users can manage a list of URLs through the options page, and each new tab will randomly select and display one of the enabled URLs.
+New Tab Shuffle is a Chrome/Edge browser extension that randomly displays URLs or local files when opening a new tab. Users can manage a list of URLs through the options page, and each new tab will randomly select and display one of the enabled URLs.
 
 ## Architecture
 
