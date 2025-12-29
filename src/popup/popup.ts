@@ -3,6 +3,7 @@ import { peekQueue } from '../lib/queue';
 
 const listEl = document.getElementById('queue-list') as HTMLUListElement;
 const emptyMessage = document.getElementById('empty-message') as HTMLParagraphElement;
+const optionsButton = document.getElementById('options-button') as HTMLButtonElement;
 
 function showEmptyMessage(text: string, kind: 'status' | 'alert') {
   emptyMessage.textContent = text;
@@ -60,3 +61,8 @@ async function init() {
 }
 
 void init();
+
+optionsButton.addEventListener('click', () => {
+  chrome.runtime.openOptionsPage();
+  window.close();
+});

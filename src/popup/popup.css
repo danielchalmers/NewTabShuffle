@@ -16,6 +16,10 @@ body {
 }
 
 .popup-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 8px;
   margin-bottom: 12px;
 }
 
@@ -28,6 +32,36 @@ h1 {
 .subtitle {
   font-size: 12px;
   color: #6b7280;
+}
+
+.icon-button {
+  border: 1px solid #cbd5e1;
+  background: #f8fafc;
+  color: #1f2937;
+  padding: 6px;
+  border-radius: 6px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+  height: 28px;
+  width: 28px;
+}
+
+.icon-button:hover {
+  background: #eef2f7;
+}
+
+.icon-button:focus-visible {
+  outline: 2px solid #4285f4;
+  outline-offset: 2px;
+}
+
+.icon-button svg {
+  width: 14px;
+  height: 14px;
+  fill: currentColor;
 }
 
 .queue-list {

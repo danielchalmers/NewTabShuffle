@@ -9,8 +9,21 @@
 <body>
   <div class="popup">
     <header class="popup-header">
-      <h1 id="popup-title">Up Next</h1>
-      <p class="subtitle">The next few sites in your queue.</p>
+      <div>
+        <h1 id="popup-title">Up Next</h1>
+        <p class="subtitle">The next few sites in your queue.</p>
+      </div>
+      <button
+        id="options-button"
+        class="icon-button"
+        type="button"
+        title="Open options"
+        aria-label="Open options"
+      >
+        <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+          <path d="M12 8.75a3.25 3.25 0 1 0 0 6.5 3.25 3.25 0 0 0 0-6.5Zm9.25 3.25c0-.44-.04-.87-.12-1.3l2.1-1.63a.75.75 0 0 0 .18-.96l-2-3.46a.75.75 0 0 0-.9-.34l-2.48 1a8.2 8.2 0 0 0-2.24-1.3l-.38-2.64A.75.75 0 0 0 14.7 1h-4a.75.75 0 0 0-.74.64l-.38 2.64c-.8.32-1.55.75-2.24 1.3l-2.48-1a.75.75 0 0 0-.9.34l-2 3.46a.75.75 0 0 0 .18.96l2.1 1.63c-.08.43-.12.86-.12 1.3s.04.87.12 1.3l-2.1 1.63a.75.75 0 0 0-.18.96l2 3.46c.2.34.61.48.98.34l2.4-.98c.69.54 1.44.98 2.24 1.3l.38 2.64c.05.36.37.63.74.63h4c.37 0 .69-.27.74-.63l.38-2.64c.8-.32 1.55-.76 2.24-1.3l2.4.98a.75.75 0 0 0 .98-.34l2-3.46a.75.75 0 0 0-.18-.96l-2.1-1.63c.08-.43.12-.86.12-1.3Zm-9.25 4.75a4.75 4.75 0 1 1 0-9.5 4.75 4.75 0 0 1 0 9.5Z"/>
+        </svg>
+      </button>
     </header>
     <main>
       <ul id="queue-list" class="queue-list" aria-labelledby="popup-title"></ul>
