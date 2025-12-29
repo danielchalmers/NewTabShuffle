@@ -1,13 +1,5 @@
 # Privacy Policy
 
-New Tab Shuffle replaces the new tab page with a URL or local file you configure. The extension does not collect or transmit personal data to the developer.
-
-## Single purpose
-
-Provide a simple new tab experience that randomly opens one of the user-configured URLs or local files.
-
-## Single purpose description
-
 The extension replaces the new tab page with a randomly selected item from a list you manage, cycling through all enabled entries before reshuffling. It does not provide any unrelated features, tracking, or external services.
 
 ## Permission justification
