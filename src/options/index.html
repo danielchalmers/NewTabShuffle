@@ -3,19 +3,16 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>New Tab Shuffle Options</title>
+  <title>New Tab Shuffle</title>
   <link rel="stylesheet" href="options.css">
 </head>
 <body>
   <div class="container">
     <header>
-      <h1>New Tab Shuffle Options</h1>
-      <p class="subtitle" id="urls-help">Paste URLs below, one per line. Changes save automatically.</p>
-      <p class="subtitle" id="queue-overview">New tabs use a shuffled queue, showing each enabled URL once before reshuffling.</p>
+      <h1>New Tab Shuffle</h1>
       <ul class="guide" id="urls-guide">
-        <li>Delete a line to remove it.</li>
-        <li>Start a line with # to disable it.</li>
-        <li>Supports http://, https://, and file://.</li>
+        <li>One URL per line. Supports http://, https://, and file://.</li>
+        <li>Delete a line to remove it. Prefix with # to disable.</li>
       </ul>
     </header>
 
@@ -25,7 +22,7 @@
         <textarea
           id="urls-textarea"
           spellcheck="false"
-          aria-describedby="urls-help urls-guide"
+          aria-describedby="urls-guide"
           aria-errormessage="error-message"
           aria-invalid="false"
           placeholder="https://example.com&#10;# https://paused.example.com&#10;file:///C:/path/to/file.html"
@@ -38,28 +35,20 @@
       </section>
 
       <section class="editor-section">
-        <div class="section-header">
-          <div>
-            <h2 class="section-title">Queue</h2>
-            <p class="section-note" id="queue-note">
-              The first line is next. You can add temporary entries here even if they are not in your main list.
-              Reset clears the queue so it reshuffles.
-            </p>
-          </div>
-          <button id="queue-reset" class="secondary-button" type="button" aria-describedby="queue-note">Clear queue</button>
-        </div>
         <label class="editor-label" for="queue-textarea">Current queue</label>
         <textarea
           id="queue-textarea"
           spellcheck="false"
-          aria-describedby="queue-overview queue-note"
           aria-errormessage="queue-error-message"
           aria-invalid="false"
           placeholder="https://example.com&#10;https://another.example.com"
         ></textarea>
         <div class="status-row">
           <span id="queue-save-status" class="status" data-state="saved" role="status" aria-live="polite" aria-atomic="true">Saved</span>
-          <span id="queue-count-status" class="counts">Queue empty</span>
+          <div class="queue-actions">
+            <span id="queue-count-status" class="counts">Queue empty</span>
+            <button id="queue-reset" class="secondary-button" type="button">Clear queue</button>
+          </div>
         </div>
         <p id="queue-error-message" class="error hidden" role="alert" aria-atomic="true"></p>
       </section>
