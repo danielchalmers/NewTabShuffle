@@ -9,12 +9,12 @@
 <body>
   <div class="popup">
     <header class="popup-header">
-      <h1>Up Next</h1>
+      <h1 id="popup-title">Up Next</h1>
       <p class="subtitle">The next few sites in your queue.</p>
     </header>
     <main>
-      <ul id="queue-list" class="queue-list"></ul>
-      <p id="empty-message" class="empty hidden">Queue is empty. Add URLs in options to start.</p>
+      <ul id="queue-list" class="queue-list" aria-labelledby="popup-title"></ul>
+      <p id="empty-message" class="empty hidden" role="status" aria-live="polite" aria-atomic="true">Queue is empty. Add URLs in options to start.</p>
     </main>
   </div>
   <script type="module" src="popup.ts"></script>

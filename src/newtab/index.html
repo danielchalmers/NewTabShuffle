@@ -7,10 +7,10 @@
   <link rel="stylesheet" href="newtab.css">
 </head>
 <body>
-  <div id="container">
-    <iframe id="content-frame"></iframe>
-    <div id="message" class="hidden"></div>
-  </div>
+  <main id="container">
+    <iframe id="content-frame" title="Shuffled page"></iframe>
+    <div id="message" class="hidden" role="status" aria-live="polite" aria-atomic="true"></div>
+  </main>
   <script type="module" src="newtab.ts"></script>
 </body>
 </html>

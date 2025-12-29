@@ -122,6 +122,11 @@ h1 {
   background: #eef2f7;
 }
 
+.secondary-button:focus-visible {
+  outline: 2px solid #4285f4;
+  outline-offset: 2px;
+}
+
 .status-row {
   display: flex;
   justify-content: space-between;

@@ -4,6 +4,13 @@ import { peekQueue } from '../lib/queue';
 const listEl = document.getElementById('queue-list') as HTMLUListElement;
 const emptyMessage = document.getElementById('empty-message') as HTMLParagraphElement;
 
+function showEmptyMessage(text: string, kind: 'status' | 'alert') {
+  emptyMessage.textContent = text;
+  emptyMessage.setAttribute('role', kind === 'alert' ? 'alert' : 'status');
+  emptyMessage.setAttribute('aria-live', kind === 'alert' ? 'assertive' : 'polite');
+  emptyMessage.classList.remove('hidden');
+}
+
 function renderQueue(preview: string[]) {
   listEl.innerHTML = '';
   const fragment = document.createDocumentFragment();
@@ -38,7 +45,7 @@ async function init() {
 
     if (preview.length === 0) {
       listEl.classList.add('hidden');
-      emptyMessage.classList.remove('hidden');
+      showEmptyMessage('Queue is empty. Add URLs in options to start.', 'status');
       return;
     }
 
@@ -48,8 +55,7 @@ async function init() {
   } catch (error) {
     console.error('Error loading queue preview:', error);
     listEl.classList.add('hidden');
-    emptyMessage.textContent = 'Unable to load queue. Check your options.';
-    emptyMessage.classList.remove('hidden');
+    showEmptyMessage('Unable to load queue. Check your options.', 'alert');
   }
 }
 

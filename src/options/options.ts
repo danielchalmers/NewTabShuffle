@@ -18,6 +18,10 @@ let saveTimer: number | undefined;
 let queueSaveTimer: number | undefined;
 let isQueueDirty = false;
 
+function setFieldValidity(field: HTMLTextAreaElement, isInvalid: boolean) {
+  field.setAttribute('aria-invalid', isInvalid ? 'true' : 'false');
+}
+
 function formatUrls(urls: UrlEntry[]): string {
   return urls
     .map((entry) => (entry.enabled ? entry.url : `# ${entry.url}`))
@@ -120,6 +124,10 @@ function parseQueueText(text: string): {
 }
 
 function setSaveState(state: 'saved' | 'saving' | 'error') {
+  if (saveStatus.dataset.state === state) {
+    return;
+  }
+
   saveStatus.dataset.state = state;
 
   if (state === 'saving') {
@@ -136,6 +144,10 @@ function setSaveState(state: 'saved' | 'saving' | 'error') {
 }
 
 function setQueueSaveState(state: 'saved' | 'saving' | 'error') {
+  if (queueSaveStatus.dataset.state === state) {
+    return;
+  }
+
   queueSaveStatus.dataset.state = state;
 
   if (state === 'saving') {
@@ -181,24 +193,28 @@ function showError(invalidLines: number[]) {
   if (invalidLines.length === 0) {
     errorMessage.classList.add('hidden');
     errorMessage.textContent = '';
+    setFieldValidity(textarea, false);
     return;
   }
 
   const lineLabel = invalidLines.length === 1 ? 'line' : 'lines';
   errorMessage.textContent = `Invalid URL on ${lineLabel}: ${invalidLines.join(', ')}. Fix to save.`;
   errorMessage.classList.remove('hidden');
+  setFieldValidity(textarea, true);
 }
 
 function showQueueError(invalidLines: number[]) {
   if (invalidLines.length === 0) {
     queueErrorMessage.classList.add('hidden');
     queueErrorMessage.textContent = '';
+    setFieldValidity(queueTextarea, false);
     return;
   }
 
   const lineLabel = invalidLines.length === 1 ? 'line' : 'lines';
   queueErrorMessage.textContent = `Invalid URL on ${lineLabel}: ${invalidLines.join(', ')}. Fix to save.`;
   queueErrorMessage.classList.remove('hidden');
+  setFieldValidity(queueTextarea, true);
 }
 
 async function saveFromTextarea() {
@@ -241,6 +257,7 @@ function scheduleSave() {
 
   setSaveState('saving');
   errorMessage.classList.add('hidden');
+  setFieldValidity(textarea, false);
   saveTimer = window.setTimeout(() => {
     void saveFromTextarea();
   }, SAVE_DELAY_MS);
@@ -253,6 +270,7 @@ function scheduleQueueSave() {
 
   setQueueSaveState('saving');
   queueErrorMessage.classList.add('hidden');
+  setFieldValidity(queueTextarea, false);
   isQueueDirty = true;
   queueSaveTimer = window.setTimeout(() => {
     void saveQueueFromTextarea();

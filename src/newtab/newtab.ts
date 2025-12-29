@@ -19,35 +19,44 @@ async function canLoadFileUrls(): Promise<boolean> {
 async function loadNextUrl() {
   const messageEl = document.getElementById('message') as HTMLDivElement;
   const frameEl = document.getElementById('content-frame') as HTMLIFrameElement;
-  
+
+  const showMessage = (text: string, kind: 'status' | 'alert') => {
+    frameEl.classList.add('hidden');
+    messageEl.classList.remove('hidden');
+    messageEl.textContent = text;
+    messageEl.setAttribute('role', kind === 'alert' ? 'alert' : 'status');
+    messageEl.setAttribute('aria-live', kind === 'alert' ? 'assertive' : 'polite');
+  };
+
+  const showFrame = (url: string) => {
+    frameEl.src = url;
+    frameEl.classList.remove('hidden');
+    messageEl.classList.add('hidden');
+  };
+
   try {
     const [urls, queue] = await Promise.all([getUrls(), getQueue()]);
     const { nextUrl, remainingQueue } = takeNextFromQueue(queue, urls);
     const nextQueue =
       nextUrl && remainingQueue.length === 0 ? getShuffledUrls(urls) : remainingQueue;
     await saveQueue(nextQueue);
-    
+
     if (nextUrl) {
       if (isFileUrl(nextUrl) && !(await canLoadFileUrls())) {
-        frameEl.classList.add('hidden');
-        messageEl.classList.remove('hidden');
-        messageEl.textContent = 'File URLs require enabling "Allow access to file URLs" in the extension details.';
+        showMessage(
+          'File URLs require enabling "Allow access to file URLs" in the extension details.',
+          'alert'
+        );
         return;
       }
 
-      frameEl.src = nextUrl;
-      frameEl.classList.remove('hidden');
-      messageEl.classList.add('hidden');
+      showFrame(nextUrl);
     } else {
-      frameEl.classList.add('hidden');
-      messageEl.classList.remove('hidden');
-      messageEl.textContent = 'No URLs configured. Open the extension options to add URLs.';
+      showMessage('No URLs configured. Open the extension options to add URLs.', 'status');
     }
   } catch (error) {
     console.error('Error loading next URL:', error);
-    frameEl.classList.add('hidden');
-    messageEl.classList.remove('hidden');
-    messageEl.textContent = 'Error loading URL. Please check your settings.';
+    showMessage('Error loading URL. Please check your settings.', 'alert');
   }
 }
 
